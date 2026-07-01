@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Context Test Page</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding-top: 50px; background: #f4f4f9; }
+        .box { background: white; padding: 30px; display: inline-block; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>Application Context Reader</h1>
+        <p id="status">Reading original tab data...</p>
+    </div>
+
+    <script>
+        // Wait for the browser window context to load completely
+        window.addEventListener('load', () => {
+            const statusText = document.getElementById('status');
+            
+            // Check if the window.opener reference exists
+            if (window.opener) {
+                try {
+                    // Try to look back into the original tab's DOM structure
+                    const parentDocument = window.opener.document;
+                    const usernameElement = parentDocument.querySelector('div.mat-card-header-text mat-card-title.mat-card-title b');
+
+                    if (usernameElement) {
+                        const username = usernameElement.innerText;
+                        statusText.innerHTML = `<strong>Success!</strong> Found username from parent tab: <span style="color: blue; font-size: 20px;">${username}</span>`;
+                    } else {
+                        statusText.innerHTML = "Connected to original tab, but couldn't find the exact HTML element structure.";
+                    }
+                } catch (error) {
+                    // If the browser cross-origin policy blocks the strict DOM reading, display the error
+                    console.error(error);
+                    statusText.innerHTML = `Blocked by Browser Security (Cross-Origin Policy).<br><br><em>Note: If the main site runs on a different domain or protocol, modern browsers restrict direct DOM manipulation.</em>`;
+                }
+            } else {
+                statusText.innerHTML = "No opening context found. Open this page by clicking the link inside your forum post!";
+            }
+        });
+    </script>
+</body>
+</html>
